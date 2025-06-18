@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Club de Juegos de Mesa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .spin-animation {
+            animation: spin 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .bounce-animation {
+            animation: bounce 0.3s ease-in-out 4;
+        }
+        .flip-animation {
+            animation: spin 0.3s ease-in-out 4;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(1080deg); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
+    <div class="container mx-auto p-4 max-w-4xl">
+        <h1 class="text-4xl font-bold text-center mb-8 bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">
+            🎮 Club de Juegos de Mesa
+        </h1>
+
+```
+    <!-- Tabs -->
+    <div class="flex flex-wrap justify-center mb-8 bg-black/20 rounded-lg p-2">
+        <button onclick="showTab(0)" id="tab-0" class="tab-button px-4 py-2 m-1 rounded-lg font-semibold transition-all duration-300 bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg transform scale-105">
+            🎯 🎲 Ruletas
+        </button>
+        <button onclick="showTab(1)" id="tab-1" class="tab-button px-4 py-2 m-1 rounded-lg font-semibold transition-all duration-300 bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white">
+            📝 📋 Registro
+        </button>
+        <button onclick="showTab(2)" id="tab-2" class="tab-button px-4 py-2 m-1 rounded-lg font-semibold transition-all duration-300 bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white">
+            📈 📊 Historial
+        </button>
+        <button onclick="showTab(3)" id="tab-3" class="tab-button px-4 py-2 m-1 rounded-lg font-semibold transition-all duration-300 bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white">
+            ⚙️ 🛠️ Herramientas
+        </button>
+    </div>
+
+    <!-- Tab 0: Ruletas -->
+    <div id="tab-content-0" class="tab-content space-y-8">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold mb-4">🎯 Ruletas de Selección</h2>
+            <p class="text-lg text-gray-300">¡Gira las ruletas para elegir aleatoriamente!</p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Game Wheel -->
+            <div class="bg-black/30 rounded-xl p-6 backdrop-blur-sm">
+                <h3 class="text-2xl font-bold mb-4 text-center">🎮 Juegos</h3>
+                <div class="relative">
+                    <div id="game-wheel" class="w-48 h-48 mx-auto rounded-full bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-xl font-bold shadow-2xl transition-transform duration-2000 cursor-pointer">
+                        🎲
+                    </div>
+                    <div class="mt-4 text-center">
+                        <p id="selected-game-text" class="text-lg mb-2 hidden">🏆 Juego seleccionado: <span id="selected-game" class="text-yellow-400 font-bold"></span></p>
+                    </div>
+                </div>
+                
+                <div class="mt-6 space-y-3">
+                    <div class="flex gap-2">
+                        <input type="text" id="new-game-input" placeholder="Nuevo juego..." class="flex-1 px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:border-pink-400 focus:outline-none">
+                        <button onclick="addGame()" class="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg transition-colors">
+                            ➕
+                        </button>
+                    </div>
+                    
+                    <button onclick="spinGameWheel()" id="spin-game-btn" class="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-lg font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                        🎯 Girar Ruleta
+                    </button>
+                    
+                    <div class="text-sm text-gray-300">
+                        <p>Juegos disponibles: <span id="games-list">Scrabble, Rummikub, Virus, Fluxx</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player Wheel -->
+            <div class="bg-black/30 rounded-xl p-6 backdrop-blur-sm">
+                <h3 class="text-2xl font-bold mb-4 text-center">👥 Jugadores</h3>
+                <div class="relative">
+                    <div id="player-wheel" class="w-48 h-48 mx-auto rounded-full bg-gradient-to-r from-green-500 to-blue-600 flex items-center justify-center text-xl font-bold shadow-2xl transition-transform duration-2000 cursor-pointer">
+                        👤
+                    </div>
+                    <div class="mt-4 text-center">
+                        <p id="selected-player-text" class="text-lg mb-2 hidden">🎯 Jugador seleccionado: <span id="selected-player" class="text-green-400 font-bold"></span></p>
+                    </div>
+                </div>
+                
+                <div class="mt-6 space-y-3">
+                    <div class="flex gap-2">
+                        <input type="text" id="new-player-input" placeholder="Nuevo jugador..." class="flex-1 px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:border-green-400 focus:outline-none">
+                        <button onclick="addPlayer()" class="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg transition-colors">
+                            ➕
+                        </button>
+                    </div>
+                    
+                    <button onclick="spinPlayerWheel()" id="spin-player-btn" class="w-full py-3 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 rounded-lg font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                        🎯 Girar Ruleta
+                    </button>
+                    
+                    <div class="text-sm text-gray-300">
+                        <p>Jugadores disponibles: <span id="players-list">Dayra, Josué</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 1: Registro -->
+    <div id="tab-content-1" class="tab-content space-y-6 hidden">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold mb-4">📋 Registro de Partida</h2>
+            <p class="text-lg text-gray-300">Registra los detalles de tu sesión de juego</p>
+        </div>
+        
+        <div class="bg-black/30 rounded-xl p-6 backdrop-blur-sm">
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2">📅 Fecha y Hora</label>
+                    <input type="datetime-local" id="game-date" class="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:border-blue-400 focus:outline-none">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">🏠 Sede</label>
+                    <select id="venue" class="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:border-blue-400 focus:outline-none">
+                        <option value="">Seleccionar sede...</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-sm font-medium mb-2">🎮 Juego</label>
+                <input type="text" id="current-game" placeholder="Nombre del juego..." class="w-full px-3 py-2 bg-white/10 rounded-lg border border-white/20 focus:border-blue-400 focus:outline-none">
+            </div>
+            
+            <div class="bg-white/10 rounded-lg p-4">
+                <h3 class="text-xl font-bold mb-4">👥 Jugadores y Ganador</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="font-semibold mb-2">Jugadores</h4>
+                        <div id="game-players-list" class="space-y-2">
+                            <!-- Jugadores aparecerán aquí dinámicamente -->
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="font-semibold mb-2">Ganador Seleccionado</h4>
+                        <div id="winner-display" class="p-4 bg-yellow-500/20 rounded-lg text-center">
+                            <div class="text-gray-400">Selecciona un ganador</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="saveGame()" class="w-full mt-6 py-3 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 rounded-lg font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                💾 Guardar Partida
+            </button>
+        </div>
+    </div>
+
+    <!-- Tab 2: Historial -->
+    <div id="tab-content-2" class="tab-content space-y-6 hidden">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold mb-4">📊 Historial de Partidas</h2>
+            <p class="text-lg text-gray-300">Estadísticas y registro de todas las partidas</p>
+        </div>
+        
+        <div class="bg-black/30 rounded-xl p-6 backdrop-blur-sm">
+            <div id="history-content">
+                <div class="text-center py-8">
+                    <div class="text-4xl mb-4">📊</div>
+                    <p class="text-xl text-gray-400">No hay partidas registradas aún</p>
+                    <p class="text-gray-500 mt-2">¡Comienza a jugar y registra tus partidas!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 3: Herramientas -->
+    <div id="tab-content-3" class="tab-content space-y-6 hidden">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold mb-4">🛠️ Herramientas de Juego</h2>
+            <p class="text-lg text-gray-300">Utilidades para tus partidas</p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-6">
+            <!-- Dice -->
+            <div class="bg-black/30 rounded-xl p-6 backdrop-blur-sm text-center">
+                <h3 class="text-2xl font-bold mb-4">🎲 Dado</h3>
+                <div id="dice-display" class="w-24 h-24 mx-auto bg-white rounded-lg flex items-center justify-center text-4xl font-bold text-black mb-4 shadow-lg transition-transform duration-300">
+                    ?
+                </div>
+                <button onclick="rollDice()" id="dice-btn" class="w-full py-3 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 rounded-lg font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                    🎲 Lanzar Dado
+                </button>
+            </div>
+
+            <!-- Coin -->
+            <div class="bg-black/30 rounded-xl p-6 backdrop-blur-sm text-center">
+                <h3 class="text-2xl font-bold mb-4">🪙 Moneda</h3>
+                <div id="coin-display" class="w-24 h-24 mx-auto bg-yellow-400 rounded-full flex items-center justify-center text-2xl font-bold text-black mb-4 shadow-lg transition-transform duration-300">
+                    ?
+                </div>
+                <button onclick="flipCoin()" id="coin-btn" class="w-full py-3 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 rounded-lg font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                    🪙 Lanzar Moneda
+                </button>
+            </div>
+
+            <!-- Timer -->
+            <div class="bg-black/30 rounded-xl p-6 backdrop-blur-sm text-center">
+                <h3 class="text-2xl font-bold mb-4">⏰ Temporizador</h3>
+                <div id="timer-display" class="text-4xl font-bold mb-4 text-yellow-400">
+                    00:30
+                </div>
+                
+                <div class="flex items-center justify-center gap-2 mb-4">
+                    <button onclick="adjustTimer(-10)" class="px-3 py-1 bg-red-500 hover:bg-red-600 rounded text-sm">
+                        -10s
+                    </button>
+                    <span class="text-sm">⚙️ <span id="timer-setting">30</span>s</span>
+                    <button onclick="adjustTimer(10)" class="px-3 py-1 bg-green-500 hover:bg-green-600 rounded text-sm">
+                        +10s
+                    </button>
+                </div>
+                
+                <div class="space-y-2">
+                    <button onclick="toggleTimer()" id="timer-btn" class="w-full py-2 bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 rounded-lg font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                        ▶️ Iniciar
+                    </button>
+                    <button onclick="resetTimer()" class="w-full py-2 bg-gray-500 hover:bg-gray-600 rounded-lg font-bold transition-all duration-300 flex items-center justify-center gap-2">
+                        🔄 Reiniciar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Estado global
+    let activeTab = 0;
+    let games = ['Scrabble', 'Rummikub', 'Virus', 'Fluxx'];
+    let players = ['Dayra', 'Josué'];
+    let gameHistory = [];
+    let selectedGame = '';
+    let selectedPlayer = '';
+    let currentWinner = '';
+    let timerSeconds = 30;
+    let timeLeft = 30;
+    let timerRunning = false;
+    let timerInterval = null;
+
+    // Inicializar la aplicación
+    function init() {
+        setCurrentDateTime();
+        updateGamesList();
+        updatePlayersList();
+        updateVenueOptions();
+        updateGamePlayersList();
+        updateHistoryDisplay();
+    }
+
+    // Funciones de tabs
+    function showTab(tabIndex) {
+        // Ocultar todos los tabs
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.add('hidden');
+        });
+        
+        // Remover estilos activos de todos los botones
+        document.querySelectorAll('.tab-button').forEach(btn => {
+            btn.className = 'tab-button px-4 py-2 m-1 rounded-lg font-semibold transition-all duration-300 bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white';
+        });
+        
+        // Mostrar tab activo
+        document.getElementById(`tab-content-${tabIndex}`).classList.remove('hidden');
+        
+        // Activar botón del tab
+        document.getElementById(`tab-${tabIndex}`).className = 'tab-button px-4 py-2 m-1 rounded-lg font-semibold transition-all duration-300 bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-lg transform scale-105';
+        
+        activeTab = tabIndex;
+    }
+
+    // Funciones de fecha
+    function getMexicoCentralTime() {
+        const now = new Date();
+        const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+        const mexicoTime = new Date(utc + (-6 * 3600000));
+        return mexicoTime.toISOString().slice(0, 16);
+    }
+
+    function setCurrentDateTime() {
+        document.getElementById('game-date').value = getMexicoCentralTime();
+    }
+
+    // Funciones de juegos
+    function addGame() {
+        const input = document.getElementById('new-game-input');
+        const newGame = input.value.trim();
+        
+        if (newGame && !games.includes(newGame)) {
+            games.push(newGame);
+            input.value = '';
+            updateGamesList();
+        }
+    }
+
+    function updateGamesList() {
+        document.getElementById('games-list').textContent = games.join(', ');
+    }
+
+    function spinGameWheel() {
+        const wheel = document.getElementById('game-wheel');
+        const btn = document.getElementById('spin-game-btn');
+        
+        btn.disabled = true;
+        btn.innerHTML = '🌀 Girando...';
+        wheel.innerHTML = '🌟';
+        wheel.classList.add('spin-animation');
+        
+        setTimeout(() => {
+            const randomIndex = Math.floor(Math.random() * games.length);
+            selectedGame = games[randomIndex];
+            
+            wheel.innerHTML = selectedGame;
+            wheel.classList.remove('spin-animation');
+            
+            document.getElementById('selected-game').textContent = selectedGame;
+            document.getElementById('selected-game-text').classList.remove('hidden');
+            document.getElementById('current-game').value = selectedGame;
+            
+            btn.disabled = false;
+            btn.innerHTML = '🎯 Girar Ruleta';
+        }, 2000);
+    }
+
+    // Funciones de jugadores
+    function addPlayer() {
+        const input = document.getElementById('new-player-input');
+        const newPlayer = input.value.trim();
+        
+        if (newPlayer && !players.includes(newPlayer)) {
+            players.push(newPlayer);
+            input.value = '';
+            updatePlayersList();
+            updateVenueOptions();
+            updateGamePlayersList();
+        }
+    }
+
+    function updatePlayersList() {
+        document.getElementById('players-list').textContent = players.join(', ');
+    }
+
+    function updateVenueOptions() {
+        const venueSelect = document.getElementById('venue');
+        venueSelect.innerHTML = '<option value="">Seleccionar sede...</option>';
+        
+        players.forEach(player => {
+            const option = document.createElement('option');
+            option.value = player;
+            option.textContent = player;
+            venueSelect.appendChild(option);
+        });
+    }
+
+    function spinPlayerWheel() {
+        const wheel = document.getElementById('player-wheel');
+        const btn = document.getElementById('spin-player-btn');
+        
+        btn.disabled = true;
+        btn.innerHTML = '🌀 Girando...';
+        wheel.innerHTML = '✨';
+        wheel.classList.add('spin-animation');
+        
+        setTimeout(() => {
+            const randomIndex = Math.floor(Math.random() * players.length);
+            selectedPlayer = players[randomIndex];
+            
+            wheel.innerHTML = selectedPlayer;
+            wheel.classList.remove('spin-animation');
+            
+            document.getElementById('selected-player').textContent = selectedPlayer;
+            document.getElementById('selected-player-text').classList.remove('hidden');
+            document.getElementById('venue').value = selectedPlayer;
+            
+            btn.disabled = false;
+            btn.innerHTML = '🎯 Girar Ruleta';
+        }, 2000);
+    }
+
+    // Funciones de registro de partidas
+    function updateGamePlayersList() {
+        const container = document.getElementById('game-players-list');
+        container.innerHTML = '';
+        
+        players.forEach(player => {
+            const div = document.createElement('div');
+            div.className = 'flex items-center justify-between p-2 bg-white/10 rounded';
+            
+            const playerSpan = document.createElement('span');
+            playerSpan.textContent = player;
+            
+            const button = document.createElement('button');
+            button.className = 'winner-btn px-3 py-1 rounded text-sm transition-colors bg-white/20 hover:bg-white/30';
+            button.textContent = 'Seleccionar';
+            button.onclick = () => selectWinner(player);
+            
+            div.appendChild(playerSpan);
+            div.appendChild(button);
+            container.appendChild(div);
+        });
+    }
+
+    function selectWinner(player) {
+        currentWinner = player;
+        
+        // Actualizar todos los botones de ganador
+        document.querySelectorAll('.winner-btn').forEach(btn => {
+            btn.className = 'winner-btn px-3 py-1 rounded text-sm transition-colors bg-white/20 hover:bg-white/30';
+            btn.textContent = 'Seleccionar';
+            
+            // Si este botón corresponde al jugador seleccionado
+            if (btn.parentElement.querySelector('span').textContent === player) {
+                btn.className = 'winner-btn px-3 py-1 rounded text-sm transition-colors bg-yellow-500 text-black font-bold';
+                btn.textContent = '👑 Ganador';
+            }
+        });
+        
+        // Actualizar display
+        document.getElementById('winner-display').innerHTML = `
+            <div class="text-2xl mb-2">👑</div>
+            <div class="font-bold text-yellow-400">${player}</div>
+        `;
+    }
+
+    function saveGame() {
+        const gameDate = document.getElementById('game-date').value;
+        const venue = document.getElementById('venue').value;
+        const currentGame = document.getElementById('current-game').value;
+        
+        if (currentGame && currentWinner && venue) {
+            const gameRecord = {
+                id: Date.now(),
+                date: gameDate,
+                venue: venue,
+                game: currentGame,
+                players: [...players],
+                winner: currentWinner,
+                timestamp: new Date().toLocaleString('es-MX')
+            };
+            
+            gameHistory.push(gameRecord);
+            
+            // Reset form
+            setCurrentDateTime();
+            document.getElementById('venue').value = '';
+            document.getElementById('current-game').value = '';
+            currentWinner = '';
+            document.getElementById('winner-display').innerHTML = '<div class="text-gray-400">Selecciona un ganador</div>';
+            updateGamePlayersList();
+            updateHistoryDisplay();
+            
+            alert('🎉 ¡Partida guardada exitosamente!');
+        } else {
+            alert('⚠️ Por favor completa todos los campos');
+        }
+    }
+
+    // Funciones de historial
+    function updateHistoryDisplay() {
+        const container = document.getElementById('history-content');
+        
+        if (gameHistory.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-8">
+                    <div class="text-4xl mb-4">📊</div>
+                    <p class="text-xl text-gray-400">No hay partidas registradas aún</p>
+                    <p class="text-gray-500 mt-2">¡Comienza a jugar y registra tus partidas!</p>
+                </div>
+            `;
+        } else {
+            let tableHTML = `
+                <div class="text-center mb-6">
+                    <p class="text-xl">🎮 Total de partidas: <span class="font-bold text-yellow-400">${gameHistory.length}</span></p>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="bg-white/10">
+                                <th class="p-3 text-left border border-white/20">📅 Fecha</th>
+                                <th class="p-3 text-left border border-white/20">🏠 Sede</th>
+                                <th class="p-3 text-left border border-white/20">🎮 Juego</th>
+                                <th class="p-3 text-left border border-white/20">👥 Jugadores</th>
+                                <th class="p-3 text-left border border-white/20">👑 Ganador</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            gameHistory.forEach(game => {
+                tableHTML += `
+                    <tr class="hover:bg-white/5">
+                        <td class="p-3 border border-white/20">${new Date(game.date).toLocaleDateString('es-MX')}</td>
+                        <td class="p-3 border border-white/20">${game.venue}</td>
+                        <td class="p-3 border border-white/20 font-semibold">${game.game}</td>
+                        <td class="p-3 border border-white/20">${game.players.join(', ')}</td>
+                        <td class="p-3 border border-white/20">
+                            <span class="inline-flex items-center gap-1 bg-yellow-500/20 px-2 py-1 rounded text-yellow-400 font-bold">
+                                👑 ${game.winner}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            tableHTML += '</tbody></table></div>';
+            container.innerHTML = tableHTML;
+        }
+    }
+
+    // Funciones de herramientas
+    function rollDice() {
+        const display = document.getElementById('dice-display');
+        const btn = document.getElementById('dice-btn');
+        
+        btn.disabled = true;
+        btn.innerHTML = '🎲 Lanzando...';
+        display.innerHTML = '🎲';
+        display.classList.add('bounce-animation');
+        
+        setTimeout(() => {
+            const result = Math.floor(Math.random() * 6) + 1;
+            display.innerHTML = result;
+            display.classList.remove('bounce-animation');
+            btn.disabled = false;
+            btn.innerHTML = '🎲 Lanzar Dado';
+        }, 1000);
+    }
+
+    function flipCoin() {
+        const display = document.getElementById('coin-display');
+        const btn = document.getElementById('coin-btn');
+        
+        btn.disabled = true;
+        btn.innerHTML = '🪙 Girando...';
+        display.innerHTML = '🪙';
+        display.classList.add('flip-animation');
+        
+        setTimeout(() => {
+            const result = Math.random() > 0.5 ? 'Cara' : 'Cruz';
+            display.innerHTML = result;
+            display.classList.remove('flip-animation');
+            btn.disabled = false;
+            btn.innerHTML = '🪙 Lanzar Moneda';
+        }, 1200);
+    }
+
+    function adjustTimer(seconds) {
+        if (!timerRunning) {
+            timerSeconds = Math.max(10, timerSeconds + seconds);
+            timeLeft = timerSeconds;
+            document.getElementById('timer-setting').textContent = timerSeconds;
+            updateTimerDisplay();
+        }
+    }
+
+    function toggleTimer() {
+        const btn = document.getElementById('timer-btn');
+        
+        if (!timerRunning) {
+            timerRunning = true;
+            btn.innerHTML = '⏸️ Pausar';
+            startTimerCountdown();
+        } else {
+            timerRunning = false;
+            btn.innerHTML = '▶️ Iniciar';
+            clearInterval(timerInterval);
+        }
+    }
+
+    function resetTimer() {
+        timerRunning = false;
+        timeLeft = timerSeconds;
+        clearInterval(timerInterval);
+        document.getElementById('timer-btn').innerHTML = '▶️ Iniciar';
+        updateTimerDisplay();
+    }
+
+    function startTimerCountdown() {
+        timerInterval = setInterval(() => {
+            if (timeLeft > 0) {
+                timeLeft--;
+                updateTimerDisplay();
+            } else {
+                timerRunning = false;
+                clearInterval(timerInterval);
+                document.getElementById('timer-btn').innerHTML = '▶️ Iniciar';
+                alert('⏰ ¡Tiempo terminado!');
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const mins = Math.floor(timeLeft / 60);
+        const secs = timeLeft % 60;
+        const timeString = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        document.getElementById('timer-display').textContent = timeString;
+    }
+
+    // Event listeners para inputs
+    document.addEventListener('DOMContentLoaded', function() {
+        init();
+        
+        // Enter key listeners
+        document.getElementById('new-game-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addGame();
+        });
+        
+        document.getElementById('new-player-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addPlayer();
+        });
+    });
+</script>
+```
+
+</body>
+</html>
